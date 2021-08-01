@@ -6,8 +6,6 @@ import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import lombok.Value;
-
-
 import java.util.Locale;
 
 import static io.restassured.RestAssured.given;
@@ -24,12 +22,7 @@ public class DataGenerator
 
     private static final Faker faker = new Faker(new Locale("en"));
 
-    private DataGenerator() {}
-
     private static void sendRequest(User user) {
-        // TODO: отправить запрос на указанный в требованиях path, передав в body запроса объект user
-        //  и не забудьте передать подготовленную спецификацию requestSpec.
-        //  Пример реализации метода показан в условии к задаче.
         given()
             .spec(requestSpec)
             .body(user)
@@ -40,15 +33,11 @@ public class DataGenerator
     }
 
     public static String getRandomLogin() {
-        // TODO: добавить логику для объявления переменной login и задания её значения, для генерации
-        //  случайного логина используйте faker
         String login = faker.name().username();
         return login;
     }
 
     public static String getRandomPassword() {
-        // TODO: добавить логику для объявления переменной password и задания её значения, для генерации
-        //  случайного пароля используйте faker
         String password = faker.internet().password(8, 12, true, false, true);
         return password;
     }
@@ -58,17 +47,23 @@ public class DataGenerator
         private Registration() {}
 
         public static User getUser(String status) {
-            // TODO: создать пользователя user используя методы getRandomLogin(), getRandomPassword() и параметр status
             User user = new User(getRandomLogin(), getRandomPassword(), status);
             return user;
         }
 
         public static User getRegisteredUser(String status) {
-            // TODO: объявить переменную registeredUser и присвоить ей значение возвращённое getUser(status).
-            // Послать запрос на регистрацию пользователя с помощью вызова sendRequest(registeredUser)
             User registeredUser = getUser(status);
             sendRequest(registeredUser);
             return registeredUser;
+        }
+
+        public static User changePassword(User registeredUser) {
+            User registeredUserWithAnotherPassword = new User(
+                    registeredUser.getLogin(),
+                    getRandomPassword(),
+                    registeredUser.getStatus());
+            sendRequest(registeredUserWithAnotherPassword);
+            return registeredUserWithAnotherPassword;
         }
     }
 
